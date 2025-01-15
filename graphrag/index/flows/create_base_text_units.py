@@ -24,6 +24,10 @@ def create_base_text_units(
     strategy: ChunkStrategyType,
 ) -> pd.DataFrame:
     """All the steps to transform base text_units."""
+    if documents.empty:
+        msg = "Input DataFrame 'documents' is empty."
+        raise ValueError(msg)
+
     sort = documents.sort_values(by=["id"], ascending=[True])
 
     sort["text_with_ids"] = list(

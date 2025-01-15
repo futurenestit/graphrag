@@ -38,6 +38,7 @@ async def generate_text_embeddings(
     text_embed_config: dict,
     embedded_fields: set[str],
     snapshot_embeddings_enabled: bool = False,
+    root_dir: str = ""
 ) -> None:
     """All the steps to generate all embeddings."""
     embedding_param_map = {
@@ -103,6 +104,7 @@ async def generate_text_embeddings(
             text_embed_config=text_embed_config,
             snapshot_embeddings_enabled=snapshot_embeddings_enabled,
             **embedding_param_map[field],
+            root_dir=root_dir,
         )
 
 
@@ -115,6 +117,7 @@ async def _run_and_snapshot_embeddings(
     storage: PipelineStorage,
     text_embed_config: dict,
     snapshot_embeddings_enabled: bool,
+    root_dir: str = ""
 ) -> None:
     """All the steps to generate single embedding."""
     if text_embed_config:
@@ -125,6 +128,7 @@ async def _run_and_snapshot_embeddings(
             embed_column=embed_column,
             embedding_name=name,
             strategy=text_embed_config["strategy"],
+            root_dir=root_dir,
         )
 
         if snapshot_embeddings_enabled is True:

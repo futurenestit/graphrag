@@ -34,14 +34,14 @@ async def load(
     ) -> dict[str, Any]:
         if group is None:
             group = {}
-        text = await storage.get(path, encoding="utf-8")
+        text = await storage.get_s3(path, encoding="utf-8")
         new_item = {**group, "text": text}
         new_item["id"] = gen_sha512_hash(new_item, new_item.keys())
         new_item["title"] = str(Path(path).name)
         return new_item
 
     files = list(
-        storage.find(
+        storage.find_s3(
             re.compile(config.file_pattern),
             progress=progress,
             file_filter=config.file_filter,

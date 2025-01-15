@@ -8,6 +8,7 @@ from typing import Any
 
 import pyarrow as pa
 
+from django.conf import settings
 from graphrag.model.types import TextEmbedder
 
 from graphrag.vector_stores.base import (
@@ -21,12 +22,26 @@ import lancedb
 class LanceDBVectorStore(BaseVectorStore):
     """LanceDB vector storage implementation."""
 
-    def __init__(self, **kwargs: Any) -> None:
+    def __init__(self, root_dir: str = "", **kwargs: Any) -> None:
         super().__init__(**kwargs)
+        self.root_dir = root_dir
+        self.storage_options = {
+            "aws_access_key_id": settings.AWS_S3_ACCESS_KEY_ID,
+            "aws_secret_access_key": settings.AWS_S3_SECRET_ACCESS_KEY,
+            "endpoint_url": settings.AWS_S3_ENDPOINT_URL,
+            "region_name": settings.AWS_S3_REGION_NAME,
+            "allow_http": "true",
+        }
 
     def connect(self, **kwargs: Any) -> Any:
         """Connect to the vector storage."""
-        self.db_connection = lancedb.connect(kwargs["db_uri"])
+
+        db_uri = f"{self.root_dir}/{kwargs['db_uri']}".replace("\\", "/")
+        self.db_connection = lancedb.connect(
+            f"s3://{settings.AWS_STORAGE_BUCKET_NAME}/{db_uri}",
+            storage_options=self.storage_options,
+        )
+
         if (
             self.collection_name
             and self.collection_name in self.db_connection.table_names()

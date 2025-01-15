@@ -137,6 +137,6 @@ basic_search:
   prompt: "prompts/basic_search_system_prompt.txt"
 """
 
-INIT_DOTENV = """\
-GRAPHRAG_API_KEY=<API_KEY>
+INIT_DOTENV = f"""\
+GRAPHRAG_API_KEY={defs.OPENAI_API_KEY}
 """

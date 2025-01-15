@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import logging
 from typing import TYPE_CHECKING, Any
-
+from django.conf import settings
 from fnllm import ChatLLM, EmbeddingsLLM, JsonStrategy, LLMEvents
 from fnllm.caching import Cache as LLMCache
 from fnllm.openai import (
@@ -236,7 +236,7 @@ def _create_openai_config(config: LLMParameters, azure: bool) -> OpenAIConfig:
             chat_parameters=chat_parameters,
         )
     return PublicOpenAIConfig(
-        api_key=config.api_key,
+        api_key=settings.OPENAI_API_KEY,
         base_url=config.api_base,
         json_strategy=json_strategy,
         organization=config.organization,

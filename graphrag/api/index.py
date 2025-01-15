@@ -57,7 +57,7 @@ async def build_index(
     if is_resume_run and is_update_run:
         msg = "Cannot resume and update a run at the same time."
         raise ValueError(msg)
-
+    pipeline_config = create_pipeline_config(config, s3_root)
     pipeline_cache = (
         NoopPipelineCache() if config.cache.type == CacheType.none is None else None
     )

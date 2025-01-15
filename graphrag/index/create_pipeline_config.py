@@ -80,7 +80,7 @@ builtin_document_attributes: set[str] = {
 }
 
 
-def create_pipeline_config(settings: GraphRagConfig, verbose=False) -> PipelineConfig:
+def create_pipeline_config(settings: GraphRagConfig, s3_root: str, verbose=False) -> PipelineConfig:
     """Get the default config for the pipeline."""
     # relative to the root_dir
     if verbose:
@@ -105,8 +105,8 @@ def create_pipeline_config(settings: GraphRagConfig, verbose=False) -> PipelineC
         workflows=[
             *_document_workflows(settings),
             *_text_unit_workflows(settings, covariates_enabled),
-            *_graph_workflows(settings),
-            *_community_workflows(settings, covariates_enabled),
+            *_graph_workflows(settings, s3_root),
+            *_community_workflows(settings, covariates_enabled, s3_root),
             *(_covariate_workflows(settings) if covariates_enabled else []),
             *(_embeddings_workflows(settings, embedded_fields)),
         ],
@@ -171,7 +171,7 @@ def _text_unit_workflows(
     ]
 
 
-def _graph_workflows(settings: GraphRagConfig) -> list[PipelineWorkflowReference]:
+def _graph_workflows(settings: GraphRagConfig, s3_root: str) -> list[PipelineWorkflowReference]:
     return [
         PipelineWorkflowReference(
             name=extract_graph,
@@ -181,16 +181,16 @@ def _graph_workflows(settings: GraphRagConfig) -> list[PipelineWorkflowReference
                 "entity_extract": {
                     **settings.entity_extraction.parallelization.model_dump(),
                     "async_mode": settings.entity_extraction.async_mode,
-                    "strategy": settings.entity_extraction.resolved_strategy(
-                        settings.root_dir, settings.encoding_model
+                    "strategy": settings.entity_extraction.resolved_strategy_s3(
+                        s3_root, settings.encoding_model
                     ),
                     "entity_types": settings.entity_extraction.entity_types,
                 },
                 "summarize_descriptions": {
                     **settings.summarize_descriptions.parallelization.model_dump(),
                     "async_mode": settings.summarize_descriptions.async_mode,
-                    "strategy": settings.summarize_descriptions.resolved_strategy(
-                        settings.root_dir,
+                    "strategy": settings.summarize_descriptions.resolved_strategy_s3(
+                        s3_root,
                     ),
                 },
             },
@@ -221,7 +221,7 @@ def _graph_workflows(settings: GraphRagConfig) -> list[PipelineWorkflowReference
 
 
 def _community_workflows(
-    settings: GraphRagConfig, covariates_enabled: bool
+    settings: GraphRagConfig, covariates_enabled: bool, s3_root: str
 ) -> list[PipelineWorkflowReference]:
     return [
         PipelineWorkflowReference(name=create_final_communities),
@@ -232,8 +232,8 @@ def _community_workflows(
                 "create_community_reports": {
                     **settings.community_reports.parallelization.model_dump(),
                     "async_mode": settings.community_reports.async_mode,
-                    "strategy": settings.community_reports.resolved_strategy(
-                        settings.root_dir
+                    "strategy": settings.community_reports.resolved_strategy_s3(
+                        s3_root
                     ),
                 },
             },
@@ -269,6 +269,7 @@ def _embeddings_workflows(
                 "snapshot_embeddings": settings.snapshots.embeddings,
                 "text_embed": get_embedding_settings(settings.embeddings),
                 "embedded_fields": embedded_fields,
+                "root_dir": settings.root_dir,
             },
         ),
     ]

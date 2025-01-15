@@ -23,7 +23,7 @@ async def test_find():
             items = [item[0] for item in items]
             assert items == []
 
-            await storage.set(
+            await storage.set_s3(
                 "input/christmas.txt", "Merry Christmas!", encoding="utf-8"
             )
             items = list(
@@ -32,7 +32,7 @@ async def test_find():
             items = [item[0] for item in items]
             assert items == ["input/christmas.txt"]
 
-            await storage.set("test.txt", "Hello, World!", encoding="utf-8")
+            await storage.storage.set_s3("test.txt", "Hello, World!", encoding="utf-8")
             items = list(storage.find(file_pattern=re.compile(r".*\.txt$")))
             items = [item[0] for item in items]
             assert items == ["input/christmas.txt", "test.txt"]
