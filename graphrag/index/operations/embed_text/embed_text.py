@@ -44,6 +44,7 @@ async def embed_text(
     embedding_name: str,
     id_column: str = "id",
     title_column: str | None = None,
+    root_dir: str = "",
 ):
     """
     Embed a piece of text into a vector space. The operation outputs a new column containing a mapping between doc_id and vector.
@@ -81,7 +82,7 @@ async def embed_text(
     if vector_store_config:
         collection_name = _get_collection_name(vector_store_config, embedding_name)
         vector_store: BaseVectorStore = _create_vector_store(
-            vector_store_config, collection_name
+            vector_store_config, collection_name, root_dir
         )
         vector_store_workflow_config = vector_store_config.get(
             embedding_name, vector_store_config
@@ -211,14 +212,14 @@ async def _text_embed_with_vector_store(
 
 
 def _create_vector_store(
-    vector_store_config: dict, collection_name: str
+    vector_store_config: dict, collection_name: str, root_dir: str = ""
 ) -> BaseVectorStore:
     vector_store_type: str = str(vector_store_config.get("type"))
     if collection_name:
         vector_store_config.update({"collection_name": collection_name})
 
     vector_store = VectorStoreFactory().create_vector_store(
-        vector_store_type, kwargs=vector_store_config
+        vector_store_type, kwargs=vector_store_config, root_dir=root_dir
     )
 
     vector_store.connect(**vector_store_config)

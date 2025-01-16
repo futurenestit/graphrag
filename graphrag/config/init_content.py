@@ -2,6 +2,7 @@
 # Licensed under the MIT License
 
 """Content for the init CLI command to generate a default configuration."""
+from django.conf import settings
 
 import graphrag.config.defaults as defs
 
@@ -134,6 +135,6 @@ drift_search:
   prompt: "prompts/drift_search_system_prompt.txt"
 """
 
-INIT_DOTENV = """\
-GRAPHRAG_API_KEY=<API_KEY>
+INIT_DOTENV = f"""\
+GRAPHRAG_API_KEY={settings.OPENAI_API_KEY}
 """

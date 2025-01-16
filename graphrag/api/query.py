@@ -248,6 +248,7 @@ async def local_search(
     description_embedding_store = _get_embedding_store(
         config_args=vector_store_args,  # type: ignore
         embedding_name=entity_description_embedding,
+        root_dir=config.root_dir,
     )
 
     entities_ = read_indexer_entities(nodes, entities, community_level)
@@ -284,6 +285,7 @@ async def local_search_streaming(
     community_level: int,
     response_type: str,
     query: str,
+    prompt: str | None,
 ) -> AsyncGenerator:
     """Perform a local search and return the context data and response via a generator.
 
@@ -314,11 +316,13 @@ async def local_search_streaming(
     description_embedding_store = _get_embedding_store(
         config_args=vector_store_args,  # type: ignore
         embedding_name=entity_description_embedding,
+        root_dir=config.root_dir,
     )
 
     entities_ = read_indexer_entities(nodes, entities, community_level)
     covariates_ = read_indexer_covariates(covariates) if covariates is not None else []
-    prompt = _load_search_prompt(config.root_dir, config.local_search.prompt)
+    if prompt is None:
+        prompt = _load_search_prompt(config.root_dir, config.local_search.prompt)
 
     search_engine = get_local_search_engine(
         config=config,
@@ -387,11 +391,13 @@ async def drift_search(
     description_embedding_store = _get_embedding_store(
         config_args=vector_store_args,  # type: ignore
         embedding_name=entity_description_embedding,
+        root_dir=config.root_dir,
     )
 
     full_content_embedding_store = _get_embedding_store(
         config_args=vector_store_args,  # type: ignore
         embedding_name=community_full_content_embedding,
+        root_dir=config.root_dir,
     )
 
     entities_ = read_indexer_entities(nodes, entities, community_level)
@@ -426,15 +432,18 @@ async def drift_search(
 def _get_embedding_store(
     config_args: dict,
     embedding_name: str,
+    root_dir: str = "",
 ) -> BaseVectorStore:
     """Get the embedding description store."""
     vector_store_type = config_args["type"]
     collection_name = create_collection_name(
         config_args.get("container_name", "default"), embedding_name
     )
+
     embedding_store = VectorStoreFactory().create_vector_store(
         vector_store_type=vector_store_type,
         kwargs={**config_args, "collection_name": collection_name},
+        root_dir=root_dir,
     )
     embedding_store.connect(**config_args)
     return embedding_store

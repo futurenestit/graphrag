@@ -43,7 +43,7 @@ async def _save_profiler_stats(
 
 async def _dump_stats(stats: PipelineRunStats, storage: PipelineStorage) -> None:
     """Dump the stats to the storage."""
-    await storage.set(
+    await storage.set_s3(
         "stats.json", json.dumps(asdict(stats), indent=4, ensure_ascii=False)
     )
 

@@ -17,8 +17,8 @@ async def snapshot(
     """Take a entire snapshot of the tabular data."""
     for fmt in formats:
         if fmt == "parquet":
-            await storage.set(f"{name}.parquet", input.to_parquet())
+            await storage.set_s3(f"{name}.parquet", input.to_parquet())
         elif fmt == "json":
-            await storage.set(
+            await storage.set_s3(
                 f"{name}.json", input.to_json(orient="records", lines=True)
             )

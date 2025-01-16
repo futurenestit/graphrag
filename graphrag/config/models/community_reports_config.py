@@ -5,6 +5,7 @@
 
 from pathlib import Path
 
+from django.core.files.storage import default_storage
 from pydantic import Field
 
 import graphrag.config.defaults as defs
@@ -44,6 +45,36 @@ class CommunityReportsConfig(LLMConfig):
             .decode(encoding="utf-8")
             if self.prompt
             else None,
+            "max_report_length": self.max_length,
+            "max_input_length": self.max_input_length,
+        }
+
+    def resolved_strategy_s3(self, root_dir) -> dict:
+        """Get the resolved community report extraction strategy."""
+        from graphrag.index.operations.summarize_communities import (
+            CreateCommunityReportsStrategyType,
+        )
+
+
+        prompt_key = f"{root_dir}/{self.prompt}" if self.prompt else None
+        community_report_prompt = None
+
+        if prompt_key:
+            try:
+                if not default_storage.exists(prompt_key):
+                    community_report_prompt = ("Default prompt content")
+                else:
+                    response = default_storage.open(prompt_key)
+                    community_report_prompt = response.read().decode(encoding="utf-8")
+                
+            except Exception as e:
+                error_message = f"Failed to fetch prompt from S3: {e}"
+                raise ValueError(error_message) from e
+        return self.strategy or {
+            "type": CreateCommunityReportsStrategyType.graph_intelligence,
+            "llm": self.llm.model_dump(),
+            **self.parallelization.model_dump(),
+            "extraction_prompt": community_report_prompt,
             "max_report_length": self.max_length,
             "max_input_length": self.max_input_length,
         }

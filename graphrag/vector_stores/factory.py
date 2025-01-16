@@ -33,12 +33,12 @@ class VectorStoreFactory:
 
     @classmethod
     def create_vector_store(
-        cls, vector_store_type: VectorStoreType | str, kwargs: dict
+        cls, vector_store_type: VectorStoreType | str, kwargs: dict, root_dir: str = ""
     ) -> BaseVectorStore:
         """Create or get a vector store from the provided type."""
         match vector_store_type:
             case VectorStoreType.LanceDB:
-                return LanceDBVectorStore(**kwargs)
+                return LanceDBVectorStore(root_dir=root_dir, **kwargs)
             case VectorStoreType.AzureAISearch:
                 return AzureAISearch(**kwargs)
             case _:

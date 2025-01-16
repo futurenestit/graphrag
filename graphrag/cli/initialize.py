@@ -5,6 +5,9 @@
 
 from pathlib import Path
 
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+
 from graphrag.config.init_content import INIT_DOTENV, INIT_YAML
 from graphrag.logger.factory import LoggerFactory, LoggerType
 from graphrag.prompts.index.claim_extraction import CLAIM_EXTRACTION_PROMPT
@@ -68,3 +71,44 @@ def initialize_project_at(path: Path) -> None:
         if not prompt_file.exists():
             with prompt_file.open("wb") as file:
                 file.write(content.encode(encoding="utf-8", errors="strict"))
+
+
+def initialize_project_at_s3(path: str) -> None:
+    """Initialize the project at the given path on MinIO or S3."""
+    settings_key = f"{path}/settings.yaml"
+
+    if default_storage.exists(path):
+        msg = f"Project already initialized at {path}"
+        raise ValueError(msg)
+    
+    
+    # create settings.yaml
+    
+    init_yaml_content = INIT_YAML.encode(encoding="utf-8", errors="strict")
+    default_storage.save(settings_key, ContentFile(init_yaml_content))
+
+    # create .env
+    dotenv_key = f"{path}/.env"
+    init_dotenv_content = INIT_DOTENV.encode(encoding="utf-8", errors="strict")
+    default_storage.save(dotenv_key, ContentFile(init_dotenv_content))
+    
+
+    # create input folder
+    default_storage.save(f"{path}/input/", ContentFile(""))
+
+    prompts = {
+        "entity_extraction": GRAPH_EXTRACTION_PROMPT,
+        "summarize_descriptions": SUMMARIZE_PROMPT,
+        "claim_extraction": CLAIM_EXTRACTION_PROMPT,
+        "community_report": COMMUNITY_REPORT_PROMPT,
+        "drift_search_system_prompt": DRIFT_LOCAL_SYSTEM_PROMPT,
+        "global_search_map_system_prompt": MAP_SYSTEM_PROMPT,
+        "global_search_reduce_system_prompt": REDUCE_SYSTEM_PROMPT,
+        "global_search_knowledge_system_prompt": GENERAL_KNOWLEDGE_INSTRUCTION,
+        "local_search_system_prompt": LOCAL_SEARCH_SYSTEM_PROMPT,
+        "question_gen_system_prompt": QUESTION_SYSTEM_PROMPT,
+    }
+
+    for name, content in prompts.items():
+        prompt_key = f"{path}/prompts/{name}.txt"
+        default_storage.save(prompt_key, ContentFile(content.encode("utf-8")))

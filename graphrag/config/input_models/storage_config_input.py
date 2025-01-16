@@ -3,7 +3,7 @@
 
 """Parameterization settings for the default configuration."""
 
-from typing_extensions import NotRequired, TypedDict
+from typing import NotRequired, TypedDict
 
 from graphrag.config.enums import StorageType
 

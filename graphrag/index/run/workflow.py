@@ -67,6 +67,18 @@ async def _export_workflow_output(
     return output
 
 
+async def _export_workflow_output_rdb(
+    workflow: Workflow, exporter: ParquetExporter
+) -> pd.DataFrame:
+    """Export the output from each step of the workflow."""
+    output = cast("pd.DataFrame", workflow.output())
+    # only write final output that is not empty (i.e. has content)
+    # NOTE: this design is intentional - it accounts for workflow steps with "side effects" that don't produce a formal output to save
+    if not output.empty:
+        await exporter.export(workflow.name, output)
+    return output
+
+
 def _create_callback_chain(
     callbacks: list[WorkflowCallbacks] | None, progress: ProgressLogger | None
 ) -> WorkflowCallbacks:
@@ -90,7 +102,7 @@ async def _process_workflow(
     is_resume_run: bool,
 ):
     workflow_name = workflow.name
-    if is_resume_run and await context.storage.has(f"{workflow_name}.parquet"):
+    if is_resume_run and await context.storage.has_s3(f"{workflow_name}.parquet"):
         log.info("Skipping %s because it already exists", workflow_name)
         return None
 

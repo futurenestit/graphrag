@@ -3,7 +3,7 @@
 
 """LLM Parameters model."""
 
-from typing_extensions import NotRequired, TypedDict
+from typing import NotRequired, TypedDict
 
 from graphrag.config.enums import LLMType
 

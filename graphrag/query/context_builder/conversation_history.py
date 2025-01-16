@@ -11,10 +11,6 @@ import tiktoken
 
 from graphrag.query.llm.text_utils import num_tokens
 
-"""
-Enum for conversation roles
-"""
-
 
 class ConversationRole(str, Enum):
     """Enum for conversation roles."""
@@ -39,11 +35,6 @@ class ConversationRole(str, Enum):
     def __str__(self) -> str:
         """Return string representation of the enum value."""
         return self.value
-
-
-"""
-Data class for storing a single conversation turn
-"""
 
 
 @dataclass

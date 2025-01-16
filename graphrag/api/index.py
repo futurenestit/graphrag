@@ -27,6 +27,7 @@ async def build_index(
     memory_profile: bool = False,
     callbacks: list[WorkflowCallbacks] | None = None,
     progress_logger: ProgressLogger | None = None,
+    s3_root: str = "",
 ) -> list[PipelineRunResult]:
     """Run the pipeline with the given configuration.
 
@@ -56,7 +57,7 @@ async def build_index(
         msg = "Cannot resume and update a run at the same time."
         raise ValueError(msg)
 
-    pipeline_config = create_pipeline_config(config)
+    pipeline_config = create_pipeline_config(config, s3_root)
     pipeline_cache = (
         NoopPipelineCache() if config.cache.type == CacheType.none is None else None
     )

@@ -25,7 +25,7 @@ class JsonPipelineCache(PipelineCache):
         """Get method definition."""
         if await self.has(key):
             try:
-                data = await self._storage.get(key, encoding=self._encoding)
+                data = await self._storage.get_s3(key, encoding=self._encoding)
                 data = json.loads(data)
             except UnicodeDecodeError:
                 await self._storage.delete(key)
@@ -43,7 +43,7 @@ class JsonPipelineCache(PipelineCache):
         if value is None:
             return
         data = {"result": value, **(debug_data or {})}
-        await self._storage.set(
+        await self._storage.set_s3(
             key, json.dumps(data, ensure_ascii=False), encoding=self._encoding
         )
 

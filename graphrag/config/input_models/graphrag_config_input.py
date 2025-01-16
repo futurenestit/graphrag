@@ -3,7 +3,7 @@
 
 """Parameterization settings for the default configuration."""
 
-from typing_extensions import NotRequired
+from typing import NotRequired
 
 from graphrag.config.input_models.cache_config_input import CacheConfigInput
 from graphrag.config.input_models.chunking_config_input import ChunkingConfigInput
