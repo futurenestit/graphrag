@@ -44,6 +44,7 @@ async def embed_text(
     embedding_name: str,
     id_column: str = "id",
     title_column: str | None = None,
+    root_dir: str = "",
 ):
     """
     Embed a piece of text into a vector space. The operation outputs a new column containing a mapping between doc_id and vector.

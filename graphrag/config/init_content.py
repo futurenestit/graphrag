@@ -2,6 +2,7 @@
 # Licensed under the MIT License
 
 """Content for the init CLI command to generate a default configuration."""
+from django.conf import settings
 
 import graphrag.config.defaults as defs
 
@@ -138,5 +139,5 @@ basic_search:
 """
 
 INIT_DOTENV = f"""\
-GRAPHRAG_API_KEY={defs.OPENAI_API_KEY}
+GRAPHRAG_API_KEY={settings.OPENAI_API_KEY}
 """

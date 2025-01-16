@@ -5,11 +5,10 @@
 
 from pathlib import Path
 
-import boto3
-from botocore.config import Config
-from django.conf import settings
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 
-import graphrag.config.defaults as defs
+from graphrag.config.init_content import INIT_DOTENV, INIT_YAML
 from graphrag.logger.factory import LoggerFactory, LoggerType
 from graphrag.prompts.index.claim_extraction import CLAIM_EXTRACTION_PROMPT
 from graphrag.prompts.index.community_report import (
@@ -29,17 +28,6 @@ from graphrag.prompts.query.global_search_reduce_system_prompt import (
 from graphrag.prompts.query.local_search_system_prompt import LOCAL_SEARCH_SYSTEM_PROMPT
 from graphrag.prompts.query.question_gen_system_prompt import QUESTION_SYSTEM_PROMPT
 
-s3_client = boto3.client(
-    "s3",
-    endpoint_url=settings.AWS_S3_ENDPOINT_URL,
-    aws_access_key_id=settings.AWS_S3_ACCESS_KEY_ID,
-    aws_secret_access_key=settings.AWS_S3_SECRET_ACCESS_KEY,
-    config=Config(signature_version="s3v4"),
-    region_name=settings.AWS_S3_REGION_NAME,
-)
-BUCKET_NAME = settings.AWS_STORAGE_BUCKET_NAME
-
-
 
 def initialize_project_at(path: Path) -> None:
     """Initialize the project at the given path."""
@@ -53,7 +41,7 @@ def initialize_project_at(path: Path) -> None:
     if settings_yaml.exists():
         msg = f"Project already initialized at {root}"
         raise ValueError(msg)
-    from graphrag.config.init_content import INIT_DOTENV, INIT_YAML
+    
     with settings_yaml.open("wb") as file:
         file.write(INIT_YAML.encode(encoding="utf-8", errors="strict"))
 
@@ -90,31 +78,24 @@ def initialize_project_at_s3(path: str) -> None:
     """Initialize the project at the given path on MinIO or S3."""
     settings_key = f"{path}/settings.yaml"
 
-    try:
-        s3_client.head_object(Bucket=BUCKET_NAME, Key=settings_key)
+    if default_storage.exists(path):
         msg = f"Project already initialized at {path}"
         raise ValueError(msg)
-    except s3_client.exceptions.ClientError:
-        pass
-    # defs.set_s3_root(path)  # noqa: ERA001
-    defs.set_openai_api_key(settings.OPENAI_API_KEY)
+    
+    
     # create settings.yaml
-    from graphrag.config.init_content import INIT_DOTENV, INIT_YAML
-
-    init_yaml_content = INIT_YAML.encode(
-        encoding="utf-8", errors="strict"
-    )
-    s3_client.put_object(Bucket=BUCKET_NAME, Key=settings_key, Body=init_yaml_content)
+    
+    init_yaml_content = INIT_YAML.encode(encoding="utf-8", errors="strict")
+    default_storage.save(settings_key, ContentFile(init_yaml_content))
 
     # create .env
     dotenv_key = f"{path}/.env"
-    init_dotenv_content = INIT_DOTENV.encode(
-        encoding="utf-8", errors="strict"
-    )
-    s3_client.put_object(Bucket=BUCKET_NAME, Key=dotenv_key, Body=init_dotenv_content)
+    init_dotenv_content = INIT_DOTENV.encode(encoding="utf-8", errors="strict")
+    default_storage.save(dotenv_key, ContentFile(init_dotenv_content))
+    
 
     # create input folder
-    s3_client.put_object(Bucket=BUCKET_NAME, Key=f"{path}/input/", Body="")
+    default_storage.save(f"{path}/input/", ContentFile(""))
 
     prompts = {
         "entity_extraction": GRAPH_EXTRACTION_PROMPT,
@@ -131,6 +112,4 @@ def initialize_project_at_s3(path: str) -> None:
 
     for name, content in prompts.items():
         prompt_key = f"{path}/prompts/{name}.txt"
-        s3_client.put_object(
-            Bucket=BUCKET_NAME, Key=prompt_key, Body=content.encode("utf-8")
-        )
+        default_storage.save(prompt_key, ContentFile(content.encode("utf-8")))
