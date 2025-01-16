@@ -36,7 +36,7 @@ class LanceDBVectorStore(BaseVectorStore):
         """Connect to the vector storage."""
         db_uri = f"{self.root_dir}/{kwargs['db_uri']}".replace("\\", "/")
         self.db_connection = lancedb.connect(
-            f"s3://{settings.AWS_STORAGE_BUCKET_NAME}/{db_uri}",
+            f"s3://{settings.AWS_STORAGE_BUCKET_NAME}/media/{db_uri}",
             storage_options=self.storage_options,
         )
 
