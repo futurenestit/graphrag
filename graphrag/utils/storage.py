@@ -15,12 +15,12 @@ log = logging.getLogger(__name__)
 
 async def load_table_from_storage(name: str, storage: PipelineStorage) -> pd.DataFrame:
     """Load a parquet from the storage instance."""
-    if not await storage.has(name):
+    if not await storage.has_s3(name):
         msg = f"Could not find {name} in storage!"
         raise ValueError(msg)
     try:
         log.info("reading table from storage: %s", name)
-        return pd.read_parquet(BytesIO(await storage.get(name, as_bytes=True)))
+        return pd.read_parquet(BytesIO(await storage.get_s3(name, as_bytes=True)))
     except Exception:
         log.exception("error loading table from storage: %s", name)
         raise
@@ -30,4 +30,4 @@ async def write_table_to_storage(
     table: pd.DataFrame, name: str, storage: PipelineStorage
 ) -> None:
     """Write a table to storage."""
-    await storage.set(name, table.to_parquet())
+    await storage.set_s3(name, table.to_parquet())

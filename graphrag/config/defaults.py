@@ -21,12 +21,40 @@ from graphrag.vector_stores.factory import VectorStoreType
 ASYNC_MODE = AsyncType.Threaded
 ENCODING_MODEL = "cl100k_base"
 AZURE_AUDIENCE = "https://cognitiveservices.azure.com/.default"
+
+
 #
 # LLM Parameters
 #
+def set_s3_root(path):
+    """
+    Set the root path for S3 storage.
+
+    Args:
+        path (str): The root path to set for S3 storage.
+    """
+    global CACHE_BASE_DIR, INPUT_BASE_DIR, STORAGE_BASE_DIR, UPDATE_STORAGE_BASE_DIR
+    # CACHE_BASE_DIR = f"{path}/cache"  # noqa: ERA001
+    INPUT_BASE_DIR = f"{path}/input"
+    # STORAGE_BASE_DIR = f"{path}/output"  # noqa: ERA001
+    # UPDATE_STORAGE_BASE_DIR = f"{path}/update_output"  # noqa: ERA001
+
+
+def set_openai_api_key(key):
+    """
+    Set the OpenAI API key.
+
+    Args:
+        path (str): The OpenAI API key to set.
+    """
+    global OPENAI_API_KEY
+    OPENAI_API_KEY = key
+
+
+OPENAI_API_KEY = ""
 LLM_FREQUENCY_PENALTY = 0.0
 LLM_TYPE = LLMType.OpenAIChat
-LLM_MODEL = "gpt-4-turbo-preview"
+LLM_MODEL = "gpt-4o-mini"
 LLM_MAX_TOKENS = 4000
 LLM_TEMPERATURE = 0
 LLM_TOP_P = 1

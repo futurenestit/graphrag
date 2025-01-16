@@ -121,7 +121,7 @@ async def update_dataframe_outputs(
 
     # Merge final covariates
     if (
-        await storage.has("create_final_covariates.parquet")
+        await storage.has_s3("create_final_covariates.parquet")
         and "create_final_covariates" in dataframe_dict
     ):
         progress_logger.info("Updating Final Covariates")
@@ -180,7 +180,7 @@ async def _update_community_reports(
         old_community_reports, delta_community_reports, community_id_mapping
     )
 
-    await update_storage.set(
+    await update_storage.set_s3(
         "create_final_community_reports.parquet",
         merged_community_reports.to_parquet(),
     )
@@ -200,7 +200,7 @@ async def _update_communities(
         old_communities, delta_communities, community_id_mapping
     )
 
-    await update_storage.set(
+    await update_storage.set_s3(
         "create_final_communities.parquet", merged_communities.to_parquet()
     )
 
@@ -214,7 +214,7 @@ async def _update_nodes(dataframe_dict, storage, update_storage, merged_entities
         old_nodes, delta_nodes, merged_entities_df
     )
 
-    await update_storage.set("create_final_nodes.parquet", merged_nodes.to_parquet())
+    await update_storage.set_s3("create_final_nodes.parquet", merged_nodes.to_parquet())
     return merged_nodes, community_id_mapping
 
 
@@ -226,7 +226,7 @@ async def _update_covariates(dataframe_dict, storage, update_storage):
     delta_covariates = dataframe_dict["create_final_covariates"]
 
     merged_covariates = _merge_covariates(old_covariates, delta_covariates)
-    await update_storage.set(
+    await update_storage.set_s3(
         "create_final_covariates.parquet", merged_covariates.to_parquet()
     )
 
@@ -244,7 +244,7 @@ async def _update_text_units(
         old_text_units, delta_text_units, entity_id_mapping
     )
 
-    await update_storage.set(
+    await update_storage.set_s3(
         "create_final_text_units.parquet", merged_text_units.to_parquet()
     )
 
@@ -262,7 +262,7 @@ async def _update_relationships(dataframe_dict, storage, update_storage):
         delta_relationships,
     )
 
-    await update_storage.set(
+    await update_storage.set_s3(
         "create_final_relationships.parquet", merged_relationships_df.to_parquet()
     )
 
@@ -291,7 +291,7 @@ async def _update_entities(
     )
 
     # Save the updated entities back to storage
-    await update_storage.set(
+    await update_storage.set_s3(
         "create_final_entities.parquet", merged_entities_df.to_parquet()
     )
 
@@ -316,7 +316,7 @@ async def _concat_dataframes(name, dataframe_dict, storage, update_storage):
     # Merge the final documents
     final_df = pd.concat([old_df, delta_df], copy=False)
 
-    await update_storage.set(f"{name}.parquet", final_df.to_parquet())
+    await update_storage.set_s3(f"{name}.parquet", final_df.to_parquet())
     return final_df
 
 

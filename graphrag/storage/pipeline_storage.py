@@ -26,7 +26,33 @@ class PipelineStorage(metaclass=ABCMeta):
         """Find files in the storage using a file pattern, as well as a custom filter function."""
 
     @abstractmethod
+    def find_s3(
+        self,
+        file_pattern: re.Pattern[str],
+        base_dir: str | None = None,
+        progress: ProgressLogger | None = None,
+        file_filter: dict[str, Any] | None = None,
+        max_count=-1,
+    ) -> Iterator[tuple[str, dict[str, Any]]]:
+        """Find files in the storage using a file pattern, as well as a custom filter function."""
+
+    @abstractmethod
     async def get(
+        self, key: str, as_bytes: bool | None = None, encoding: str | None = None
+    ) -> Any:
+        """Get the value for the given key.
+
+        Args:
+            - key - The key to get the value for.
+            - as_bytes - Whether or not to return the value as bytes.
+
+        Returns
+        -------
+            - output - The value for the given key.
+        """
+
+    @abstractmethod
+    async def get_s3(
         self, key: str, as_bytes: bool | None = None, encoding: str | None = None
     ) -> Any:
         """Get the value for the given key.
@@ -50,7 +76,28 @@ class PipelineStorage(metaclass=ABCMeta):
         """
 
     @abstractmethod
+    async def set_s3(self, key: str, value: Any, encoding: str | None = None) -> None:
+        """Set the value for the given key.
+
+        Args:
+            - key - The key to set the value for.
+            - value - The value to set.
+        """
+
+    @abstractmethod
     async def has(self, key: str) -> bool:
+        """Return True if the given key exists in the storage.
+
+        Args:
+            - key - The key to check for.
+
+        Returns
+        -------
+            - output - True if the key exists in the storage, False otherwise.
+        """
+
+    @abstractmethod
+    async def has_s3(self, key: str) -> bool:
         """Return True if the given key exists in the storage.
 
         Args:

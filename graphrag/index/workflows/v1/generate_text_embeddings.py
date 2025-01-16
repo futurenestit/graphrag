@@ -53,6 +53,7 @@ def build_steps(
     text_embed = config.get("text_embed", {})
     embedded_fields = config.get("embedded_fields", {})
     snapshot_embeddings = config.get("snapshot_embeddings", False)
+    root_dir = config.get("root_dir", "")
     return [
         {
             "verb": workflow_name,
@@ -60,6 +61,7 @@ def build_steps(
                 "text_embed": text_embed,
                 "embedded_fields": embedded_fields,
                 "snapshot_embeddings_enabled": snapshot_embeddings,
+                "root_dir": root_dir,
             },
             "input": input,
         },
@@ -75,6 +77,7 @@ async def workflow(
     text_embed: dict,
     embedded_fields: set[str],
     snapshot_embeddings_enabled: bool = False,
+    root_dir: str = "",
     **_kwargs: dict,
 ) -> VerbResult:
     """All the steps to generate embeddings."""
@@ -105,6 +108,7 @@ async def workflow(
         text_embed_config=text_embed,
         embedded_fields=embedded_fields,
         snapshot_embeddings_enabled=snapshot_embeddings_enabled,
+        root_dir=root_dir,
     )
 
     return create_verb_result(cast("Table", pd.DataFrame()))

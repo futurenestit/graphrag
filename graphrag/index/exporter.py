@@ -38,7 +38,7 @@ class ParquetExporter:
         filename = f"{name}.parquet"
         log.info("exporting parquet table %s", filename)
         try:
-            await self._storage.set(filename, data.to_parquet())
+            await self._storage.set_s3(filename, data.to_parquet())
         except ArrowTypeError as e:
             log.exception("Error while exporting parquet table")
             self._on_error(
