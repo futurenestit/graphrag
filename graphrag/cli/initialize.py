@@ -94,7 +94,7 @@ def initialize_project_at_s3(path: str) -> None:
     
 
     # create input folder
-    default_storage.save(f"{path}/input/", ContentFile(""))
+    default_storage.save(f"{path}/input/default_file.txt", ContentFile(""))
 
     prompts = {
         "entity_extraction": GRAPH_EXTRACTION_PROMPT,
