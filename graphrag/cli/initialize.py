@@ -93,9 +93,6 @@ def initialize_project_at_s3(path: str) -> None:
     default_storage.save(dotenv_key, ContentFile(init_dotenv_content))
     
 
-    # create input folder
-    default_storage.save(f"{path}/input/default_file.txt", ContentFile(""))
-
     prompts = {
         "entity_extraction": GRAPH_EXTRACTION_PROMPT,
         "summarize_descriptions": SUMMARIZE_PROMPT,
