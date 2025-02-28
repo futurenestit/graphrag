@@ -153,7 +153,7 @@ def join_path(file_path: str, file_name: str) -> str:
     return str(Path(file_path) / Path(file_name).parent / Path(file_name).name)
 
 
-def create_file_storage(**kwargs: Any) -> PipelineStorage:
+def create_django_file_storage(**kwargs: Any) -> PipelineStorage:
     """Create a file based storage."""
     base_dir = kwargs["base_dir"]
     log.info("Creating file storage at %s", base_dir)
