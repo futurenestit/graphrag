@@ -24,7 +24,7 @@ from graphrag.vector_stores.factory import VectorStoreType
 DEFAULT_OUTPUT_BASE_DIR = "output"
 DEFAULT_CHAT_MODEL_ID = "default_chat_model"
 DEFAULT_CHAT_MODEL_TYPE = ModelType.OpenAIChat
-DEFAULT_CHAT_MODEL = "gpt-4-turbo-preview"
+DEFAULT_CHAT_MODEL = "gpt-4o-mini"
 DEFAULT_CHAT_MODEL_AUTH_TYPE = AuthType.APIKey
 DEFAULT_EMBEDDING_MODEL_ID = "default_embedding_model"
 DEFAULT_EMBEDDING_MODEL_TYPE = ModelType.OpenAIEmbedding
@@ -318,7 +318,7 @@ class LocalSearchDefaults:
 class OutputDefaults:
     """Default values for output."""
 
-    type = OutputType.file
+    type = OutputType.django_storage
     base_dir: str = DEFAULT_OUTPUT_BASE_DIR
     connection_string: None = None
     container_name: None = None
