@@ -34,6 +34,8 @@ class LanceDBVectorStore(BaseVectorStore):
 
     def connect(self, **kwargs: Any) -> Any:
         """Connect to the vector storage."""
+        msg = f"storage_options: {self.storage_options}"
+        log.info(msg)
         db_uri = f"{self.root_dir}/{kwargs['db_uri']}".replace("\\", "/")
         msg = f"Connecting to LanceDB vector storage at {db_uri}..."
         log.info(msg)
