@@ -4,6 +4,7 @@
 """The LanceDB vector storage implementation package."""
 
 import json  # noqa: I001
+import logging
 from typing import Any
 
 import pyarrow as pa
@@ -17,6 +18,7 @@ from graphrag.vector_stores.base import (
 )
 import lancedb
 
+log = logging.getLogger(__name__)
 
 class LanceDBVectorStore(BaseVectorStore):
     """LanceDB vector storage implementation."""
@@ -33,6 +35,10 @@ class LanceDBVectorStore(BaseVectorStore):
     def connect(self, **kwargs: Any) -> Any:
         """Connect to the vector storage."""
         db_uri = f"{self.root_dir}/{kwargs['db_uri']}".replace("\\", "/")
+        msg = f"Connecting to LanceDB vector storage at {db_uri}..."
+        log.info(msg)
+        msg = f"Using Bucket name: {settings.AWS_STORAGE_BUCKET_NAME}"
+        log.info(msg)
         self.db_connection = lancedb.connect(
             f"s3://{settings.AWS_STORAGE_BUCKET_NAME}/media/{db_uri}",
             storage_options=self.storage_options,
@@ -45,6 +51,8 @@ class LanceDBVectorStore(BaseVectorStore):
             self.document_collection = self.db_connection.open_table(
                 self.collection_name
             )
+        msg = f"Connected to LanceDB vector storage at {db_uri}."
+        log.info(msg)
 
     def load_documents(
         self, documents: list[VectorStoreDocument], overwrite: bool = True

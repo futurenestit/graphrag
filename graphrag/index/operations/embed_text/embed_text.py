@@ -223,6 +223,8 @@ def _create_vector_store(
     )
 
     vector_store.connect(**vector_store_config)
+    msg = f"Connected to vector store {vector_store_type} with config {vector_store_config}"
+    log.info(msg)
     return vector_store
 
 
