@@ -431,6 +431,7 @@ class LocalSearchMixedContext(LocalContextBuilder):
                 relationship_ranking_attribute=relationship_ranking_attribute,
                 context_name="Relationships",
             )
+
             current_context.append(relationship_context)
             current_context_data["relationships"] = relationship_context_data
             total_tokens = entity_tokens + num_tokens(
