@@ -42,7 +42,7 @@ def build_entity_context(
 
     # add headers
     current_context_text = f"-----{context_name}-----" + "\n"
-    header = ["id", "entity", "description"]
+    header = ["full_id", "id", "entity", "description"]
     if include_entity_rank:
         header.append(rank_description)
     attribute_cols = (
@@ -57,6 +57,7 @@ def build_entity_context(
     all_context_records = [header]
     for entity in selected_entities:
         new_context = [
+            str(entity.id),
             entity.short_id if entity.short_id else "",
             entity.title,
             entity.description if entity.description else "",
@@ -176,7 +177,7 @@ def build_relationship_context(
 
     # add headers
     current_context_text = f"-----{context_name}-----" + "\n"
-    header = ["id", "source", "target", "description"]
+    header = ["full_id", "id", "source", "target", "description"]
     if include_relationship_weight:
         header.append("weight")
     attribute_cols = (
@@ -193,6 +194,7 @@ def build_relationship_context(
     all_context_records = [header]
     for rel in selected_relationships:
         new_context = [
+            str(rel.id),
             rel.short_id if rel.short_id else "",
             rel.source,
             rel.target,

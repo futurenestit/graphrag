@@ -315,7 +315,7 @@ class LocalSearchMixedContext(LocalContextBuilder):
         if not selected_entities or not self.text_units:
             return ("", {context_name.lower(): pd.DataFrame()})
         selected_text_units = []
-        text_unit_ids_set = set()
+        text_unit_ids_set = []
 
         unit_info_list = []
         relationship_values = list(self.relationships.values())
@@ -334,7 +334,7 @@ class LocalSearchMixedContext(LocalContextBuilder):
                     num_relationships = count_relationships(
                         entity_relationships, selected_unit
                     )
-                    text_unit_ids_set.add(text_id)
+                    text_unit_ids_set.append(text_id)
                     unit_info_list.append((selected_unit, index, num_relationships))
 
         # sort by entity_order and the number of relationships desc
@@ -350,6 +350,12 @@ class LocalSearchMixedContext(LocalContextBuilder):
             context_name=context_name,
             column_delimiter=column_delimiter,
         )
+
+        key = context_name.lower()
+        df = context_data.get(key)
+        if df is not None and not df.empty:
+            df["text_unit_id"] = text_unit_ids_set[: len(df)]
+            context_data[key] = df
 
         if return_candidate_context:
             candidate_context_data = get_candidate_text_units(
@@ -425,6 +431,7 @@ class LocalSearchMixedContext(LocalContextBuilder):
                 relationship_ranking_attribute=relationship_ranking_attribute,
                 context_name="Relationships",
             )
+
             current_context.append(relationship_context)
             current_context_data["relationships"] = relationship_context_data
             total_tokens = entity_tokens + num_tokens(
