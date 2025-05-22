@@ -159,6 +159,7 @@ class GraphExtractor:
             }),
         )
         results = response.output.content or ""
+        log.info(f"LLM RAW RESPONSE (Initial) for document (first ~100 chars): {text[:100]}...\nResponse: {results}")
 
         # Repeat to ensure we maximize entity count
         for i in range(self._max_gleanings):
@@ -168,6 +169,7 @@ class GraphExtractor:
                 history=response.history,
             )
             results += response.output.content or ""
+            log.info(f"LLM RAW RESPONSE (Continuation {i}) for document (first ~100 chars): {text[:100]}...\nResponse: {results}")
 
             # if this is the final glean, don't bother updating the continuation flag
             if i >= self._max_gleanings - 1:
@@ -179,6 +181,9 @@ class GraphExtractor:
                 history=response.history,
                 model_parameters=self._loop_args,
             )
+            loop_check_content = response.output.content or ""
+
+            log.info(f"LLM RAW RESPONSE (Loop Check {i}) for document (first ~100 chars): {text[:100]}...\nResponse: {loop_check_content}")
 
             if response.output.content != "YES":
                 break
