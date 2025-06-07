@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, ClassVar
 from graphrag.config.enums import OutputType
 from graphrag.storage.blob_pipeline_storage import create_blob_storage
 from graphrag.storage.cosmosdb_pipeline_storage import create_cosmosdb_storage
+from graphrag.storage.django_file_pipeline_storage import create_django_file_storage
 from graphrag.storage.file_pipeline_storage import create_file_storage
 from graphrag.storage.memory_pipeline_storage import MemoryPipelineStorage
 
@@ -47,6 +48,8 @@ class StorageFactory:
                 return create_file_storage(**kwargs)
             case OutputType.memory:
                 return MemoryPipelineStorage()
+            case OutputType.django_storage:
+                return create_django_file_storage(**kwargs)
             case _:
                 if storage_type in cls.storage_types:
                     return cls.storage_types[storage_type](**kwargs)

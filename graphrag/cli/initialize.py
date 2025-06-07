@@ -48,7 +48,7 @@ def initialize_project_at(path: Path, force: bool) -> None:
     ValueError
         If the project already exists and force is False.
     """
-    progress_logger = LoggerFactory().create_logger(LoggerType.RICH)
+    progress_logger = LoggerFactory().create_logger(LoggerType.PRINT)
     progress_logger.info(f"Initializing project at {path}")  # noqa: G004
     root = Path(path)
     if not root.exists():
