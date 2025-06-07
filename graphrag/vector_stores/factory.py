@@ -8,7 +8,7 @@ from typing import ClassVar
 
 from graphrag.vector_stores.azure_ai_search import AzureAISearchVectorStore
 from graphrag.vector_stores.base import BaseVectorStore
-from graphrag.vector_stores.cosmosdb import CosmosDBVectoreStore
+from graphrag.vector_stores.cosmosdb import CosmosDBVectorStore
 from graphrag.vector_stores.elasticsearch import ElasticsearchVectorStore
 from graphrag.vector_stores.lancedb import LanceDBVectorStore
 
@@ -46,7 +46,7 @@ class VectorStoreFactory:
             case VectorStoreType.AzureAISearch:
                 return AzureAISearchVectorStore(**kwargs)
             case VectorStoreType.CosmosDB:
-                return CosmosDBVectoreStore(**kwargs)
+                return CosmosDBVectorStore(**kwargs)
             case VectorStoreType.Elasticsearch:
                 return ElasticsearchVectorStore(**kwargs)
             case _:
