@@ -29,8 +29,11 @@ class LanceDBVectorStore(BaseVectorStore):
         self.storage_options = {
             "aws_access_key_id": settings.AWS_S3_ACCESS_KEY_ID,
             "aws_secret_access_key": settings.AWS_S3_SECRET_ACCESS_KEY,
-            "aws_region": settings.AWS_S3_REGION_NAME,
         }
+        if settings.AWS_S3_REGION_NAME:
+            self.storage_options["region_name"] = settings.AWS_S3_REGION_NAME
+        if settings.AWS_S3_ENDPOINT_URL:
+            self.storage_options["endpoint_url"] = settings.AWS_S3_ENDPOINT_URL
 
     def connect(self, **kwargs: Any) -> Any:
         """Connect to the vector storage."""
